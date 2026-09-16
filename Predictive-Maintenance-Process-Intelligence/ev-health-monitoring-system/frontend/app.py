@@ -13,11 +13,26 @@ except ImportError:
 app = Flask(__name__)
 app.secret_key = "ev_health_secret_key"
 
-# Original backend database
-DB_NAME = os.path.join(
-    os.path.dirname(__file__),
-    "ev-health-monitoring-system",
-    "predictive_maintenance_process.db",
+# Project database location
+# app.py is intended to live in the frontend/ folder. The shared project
+# database lives one level above it at the repository root. Keep fallbacks
+# for the older layout so the dashboard still works if launched elsewhere.
+_DB_FILENAME = "predictive_maintenance_process.db"
+_APP_DIR = os.path.abspath(os.path.dirname(__file__))
+_PROJECT_ROOT = (
+    os.path.abspath(os.path.join(_APP_DIR, ".."))
+    if os.path.basename(_APP_DIR) == "frontend"
+    else _APP_DIR
+)
+_DB_CANDIDATES = [
+    os.path.join(_PROJECT_ROOT, _DB_FILENAME),
+    os.path.join(_PROJECT_ROOT, "ev-health-monitoring-system", _DB_FILENAME),
+    os.path.join(_APP_DIR, _DB_FILENAME),
+    os.path.join(os.getcwd(), _DB_FILENAME),
+    os.path.join(os.getcwd(), "ev-health-monitoring-system", _DB_FILENAME),
+]
+DB_NAME = next(
+    (path for path in _DB_CANDIDATES if os.path.isfile(path)), _DB_CANDIDATES[0]
 )
 
 
@@ -872,36 +887,878 @@ html, body { background:#F6FAF8; }
     .page-top { margin-bottom:22px !important; }
 }
 
-/* ===== COMPLETE PRESENTATION UI PASS ===== */
-:root{--g:#168553;--g2:#16A36A;--p:#D83F83;--p2:#E05A9D;--o:#E49A18;--r:#C43B55;--ink:#17352B;--muted:#71877D;--line:#DFECE6}
-body.dashboard-body{background:linear-gradient(180deg,#F3F9F6,#FAFCFB 55%,#F2F8F5)!important;color:var(--ink)!important}
-.sidebar{width:258px!important;background:linear-gradient(180deg,#FFFFFF 0%,#FBFDFC 58%,#F6FAF8 100%)!important;border-right:1px solid #DCE8E2!important;border-top:0!important;border-bottom:0!important;border-left:0!important;box-shadow:10px 0 30px rgba(23,53,43,.07)!important;backdrop-filter:none!important}
-.sidebar-logo{margin:2px 8px 24px!important;padding:16px 15px!important;border:1px solid #DCE8E2!important;border-radius:16px!important;background:linear-gradient(135deg,#F1FAF5,#FFF4F8)!important;box-shadow:0 8px 22px rgba(23,53,43,.055)!important;color:#17352B!important}
-.sidebar-logo span{color:#17352B!important}
-.nav-section{margin:20px 12px 7px!important;color:#8A9B94!important;font-size:10px!important;font-weight:900!important;letter-spacing:1.5px!important}
-.sidebar a,.sidebar .nav-link{margin:4px 10px!important;padding:11px 14px!important;border-radius:12px!important;border:1px solid transparent!important;color:#526A61!important;font-weight:700!important;transition:all .2s ease!important}
-.sidebar a:hover,.sidebar .nav-link:hover{background:#F1F7F4!important;color:#17352B!important;border-color:#E0ECE7!important;transform:translateX(3px)!important}
-.sidebar a.active,.sidebar .nav-link.active{background:linear-gradient(90deg,#ECF8F2,#FFF4F8)!important;color:#17352B!important;border:1px solid #D5E9DF!important;box-shadow:inset 4px 0 #168553,0 5px 14px rgba(23,53,43,.055)!important}
-.sidebar a.active:after,.sidebar .nav-link.active:after{content:"";float:right;width:6px;height:6px;margin-top:6px;border-radius:50%;background:#D83F83!important;box-shadow:0 0 0 4px rgba(216,63,131,.09)!important}
-.logout-link{margin-top:24px!important;background:#FFF4F5!important;color:#B83B55!important;border-color:#F3D7DD!important;border-top:1px solid #F3D7DD!important}
-.logout-link:hover{background:#FFECEF!important;color:#A92F49!important;border-color:#EDC6CF!important}
-.page-title{font-weight:900!important;letter-spacing:-1px!important;color:var(--ink)!important}.page-subtitle{color:var(--muted)!important;font-weight:600!important}.section-kicker{color:var(--p)!important;font-weight:900!important;letter-spacing:1.4px!important}
-.panel,.func-panel,.stations-panel,.alerts-panel,.maintenance-panel,.analytics-panel,.analytics-table,.prediction-list-panel,.prediction-form-card{background:#fff!important;border:1px solid var(--line)!important;border-radius:20px!important;box-shadow:0 12px 30px rgba(23,53,43,.065)!important}
-/* dashboard */
-.dashboard-page{max-width:1280px!important;padding:34px!important}.dashboard-hero{padding-bottom:34px!important}.dashboard-hero h1{font-size:46px!important;color:var(--ink)!important}.dashboard-metrics{gap:18px!important;margin-bottom:22px!important}.dash-metric{min-height:136px!important;border:1px solid var(--line)!important;border-top:4px solid var(--g)!important;border-radius:20px!important;box-shadow:0 12px 30px rgba(23,53,43,.06)!important;transition:.2s!important}.dash-metric:hover,.station-card:hover,.component-stat:hover,.modern-prediction-card:hover{transform:translateY(-4px)!important;box-shadow:0 17px 34px rgba(23,53,43,.10)!important}.dash-metric:nth-child(2),.dash-metric:nth-child(6){border-top-color:var(--p)!important}.dash-metric:nth-child(3),.dash-metric:nth-child(7){border-top-color:var(--o)!important}.dash-metric:nth-child(4){border-top-color:var(--r)!important}.dash-metric:nth-child(5),.dash-metric:nth-child(8){border-top-color:var(--g2)!important}.dash-metric:nth-child(2) .dash-metric-value,.dash-metric:nth-child(6) .dash-metric-value{color:var(--p)!important}.dash-metric:nth-child(3) .dash-metric-value,.dash-metric:nth-child(7) .dash-metric-value{color:#B8750B!important}.dash-metric:nth-child(4) .dash-metric-value{color:var(--r)!important}.dash-panel{border:1px solid var(--line)!important;border-radius:22px!important;box-shadow:0 12px 30px rgba(23,53,43,.065)!important}.dash-chart{height:285px!important}.dash-ring{width:182px!important;height:182px!important;box-shadow:0 10px 28px rgba(22,163,106,.10)!important}.dash-table td{transition:.15s!important}.dash-table tr:hover td{background:#EFF8F3!important}.dash-insight{background:linear-gradient(105deg,#F0FAF5,#FFF2F8)!important;border:1px solid #F0D0DF!important}.dash-insight-action{background:var(--p)!important;color:#fff!important;border-color:var(--p)!important}
-/* stations */
-.stations-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:22px!important}.station-metric{background:#fff!important;border:1px solid var(--line)!important;border-top:4px solid var(--g)!important;box-shadow:0 11px 28px rgba(23,53,43,.06)!important}.station-metric:nth-child(2){border-top-color:var(--p)!important}.station-metric:nth-child(3){border-top-color:var(--o)!important}.station-card{background:#fff!important;border:1px solid var(--line)!important;border-left:4px solid var(--g)!important;border-radius:19px!important;box-shadow:0 8px 24px rgba(23,53,43,.05)!important;transition:.2s!important}.station-card:nth-child(2n){border-left-color:var(--p)!important}.station-card:nth-child(3n){border-left-color:var(--o)!important}.station-card-title{font-size:20px!important;font-weight:900!important}.station-card-location{font-size:12px!important}
-/* alerts */
-.alert-stat{background:#fff!important;border:1px solid var(--line)!important;border-radius:19px!important;box-shadow:0 11px 28px rgba(23,53,43,.06)!important}.alert-card{background:#fff!important;border:1px solid var(--line)!important;border-left:5px solid var(--o)!important;border-radius:17px!important;box-shadow:0 8px 22px rgba(23,53,43,.05)!important;transition:.2s!important}.alert-card.critical{border-left-color:var(--r)!important;background:linear-gradient(90deg,#FFF7F8,#fff 38%)!important}.alert-card.warning{border-left-color:var(--o)!important;background:linear-gradient(90deg,#FFFBF2,#fff 38%)!important}.alert-card:hover{transform:translateX(3px)!important}.view-alert{background:var(--p)!important;color:#fff!important;border:0!important;border-radius:10px!important}
-/* maintenance */
-.component-stat{background:#fff!important;border:1px solid var(--line)!important;border-radius:19px!important;box-shadow:0 10px 26px rgba(23,53,43,.06)!important;transition:.2s!important}.maintenance-card{background:#fff!important;border:1px solid var(--line)!important;border-left:5px solid var(--g)!important;border-radius:18px!important;box-shadow:0 8px 23px rgba(23,53,43,.05)!important;transition:.2s!important;position:relative!important;overflow:hidden!important}.maintenance-card:has(.maintenance-pending){border-left-color:var(--o)!important}.maintenance-card:has(.maintenance-scheduled){border-left-color:var(--p)!important}.maintenance-card:after{content:"";position:absolute;left:0;bottom:0;height:3px;width:100%;background:linear-gradient(90deg,var(--g),transparent);opacity:.35}
-/* prediction */
-.prediction-form-card{position:relative!important;overflow:hidden!important}.prediction-form-card:before{content:"";position:absolute;left:0;top:0;width:100%;height:5px;background:linear-gradient(90deg,var(--g),var(--o),var(--p))}.prediction-stat{border:1px solid var(--line)!important;box-shadow:0 10px 26px rgba(23,53,43,.06)!important}.modern-prediction-card{background:#fff!important;border:1px solid var(--line)!important;border-left:5px solid var(--g)!important;box-shadow:0 8px 22px rgba(23,53,43,.05)!important}.modern-prediction-card:has(.prediction-danger){border-left-color:var(--r)!important;background:linear-gradient(90deg,#FFF7F8,#fff 35%)!important}.modern-prediction-card:has(.prediction-other){border-left-color:var(--o)!important;background:linear-gradient(90deg,#FFFCF5,#fff 35%)!important}
-/* analytics */
-.analytics-selector{border:1px solid var(--line)!important;box-shadow:0 11px 28px rgba(23,53,43,.06)!important}.analytics-load{background:linear-gradient(135deg,var(--g),#2BAA78)!important}.analytics-metric{border:1px solid var(--line)!important;box-shadow:0 9px 25px rgba(23,53,43,.055)!important;transition:.2s!important}.analytics-metric:hover{transform:translateY(-3px)!important}.analytics-panel,.analytics-table{border:1px solid var(--line)!important;box-shadow:0 11px 28px rgba(23,53,43,.06)!important}.analytics-table tbody tr:hover td{background:#F3F9F6!important}
-/* generic tables / topbar */
-table tbody tr{transition:.15s!important}.topbar{background:rgba(255,255,255,.88)!important;border-bottom:1px solid var(--line)!important;backdrop-filter:blur(10px)!important}
-@media(max-width:1100px){.dashboard-metrics{grid-template-columns:repeat(2,1fr)!important}.stations-layout{grid-template-columns:1fr!important}}@media(max-width:700px){.dashboard-metrics,.stations-metrics,.alert-stats,.prediction-stats{grid-template-columns:1fr!important}.dashboard-grid,.dashboard-lists,.analytics-two{grid-template-columns:1fr!important}.dashboard-page{padding:24px 15px!important}.dashboard-hero h1{font-size:36px!important}}
+
+
+/* ===== VIBRANT MEDIUM-GREEN THEME ===== */
+:root{
+    --vgreen:#19A968;
+    --vgreen2:#28C978;
+    --vgreen3:#0F8F58;
+    --vpink:#D83F83;
+    --vorange:#E49A18;
+    --vred:#C43B55;
+    --vink:#17352B;
+    --vmuted:#6C8278;
+    --vline:#DDEBE4;
+}
+
+html,body{background:#F4FAF7 !important;}
+.dashboard-body{background:linear-gradient(180deg,#F1FAF5 0%,#FAFCFB 55%,#F3F9F6 100%) !important;color:var(--vink) !important;}
+.main-content{background:transparent !important;}
+
+/* Remove the large project-name box from the dashboard sidebar. */
+.sidebar-logo{display:none !important;}
+.sidebar{padding-top:26px !important;background:linear-gradient(180deg,#FFFFFF 0%,#F8FCFA 100%) !important;border-right:1px solid #D9E8E0 !important;box-shadow:9px 0 28px rgba(23,53,43,.07) !important;}
+.sidebar a,.sidebar .nav-link{color:#4D6A5F !important;}
+.sidebar a:hover,.sidebar .nav-link:hover{background:#EAF8F1 !important;color:#17352B !important;border-color:#D0EBDD !important;transform:translateX(3px) !important;}
+.sidebar a.active,.sidebar .nav-link.active{background:linear-gradient(90deg,#E6F8EE,#FFF2F8) !important;color:#17352B !important;border:1px solid #CBE7D8 !important;box-shadow:inset 4px 0 0 var(--vgreen),0 5px 15px rgba(23,53,43,.06) !important;}
+.sidebar a.active:after,.sidebar .nav-link.active:after{content:"";float:right;width:6px;height:6px;margin-top:6px;border-radius:50%;background:var(--vpink) !important;box-shadow:0 0 0 4px rgba(216,63,131,.10) !important;}
+.logout-link{background:#FFF1F4 !important;color:#B63B55 !important;border-color:#F0D1D9 !important;}
+
+/* Medium-green rather than dark-green dashboard surfaces. */
+.metric-card,.panel,.dash-panel,.station-card,.maintenance-card,.alert-card,.prediction-form-card,.prediction-list-panel,.analytics-panel,.analytics-chart-panel,.analytics-table,.component-stat,.station-metric,.alert-stat{
+    background:#FFFFFF !important;
+    border-color:var(--vline) !important;
+    box-shadow:0 11px 28px rgba(23,53,43,.065) !important;
+}
+.dash-metric,.station-metric,.component-stat,.alert-stat{border-top:4px solid var(--vgreen) !important;}
+.dash-metric:nth-child(2),.station-metric:nth-child(2){border-top-color:var(--vpink) !important;}
+.dash-metric:nth-child(3),.station-metric:nth-child(3){border-top-color:var(--vorange) !important;}
+.dash-metric:nth-child(4){border-top-color:var(--vred) !important;}
+.dash-metric:nth-child(5),.dash-metric:nth-child(8){border-top-color:var(--vgreen2) !important;}
+
+/* Make green controls vivid, not flat. */
+button,.btn,.analytics-load,.login-btn{
+    background:linear-gradient(135deg,var(--vgreen3) 0%,var(--vgreen) 48%,var(--vgreen2) 100%) !important;
+    border-color:transparent !important;
+    box-shadow:0 8px 20px rgba(25,169,104,.20) !important;
+}
+button:hover,.btn:hover,.analytics-load:hover,.login-btn:hover{
+    background:linear-gradient(135deg,#0B7F4D 0%,#19B96D 50%,#35D987 100%) !important;
+    transform:translateY(-1px);
+}
+
+/* Keep the three-accent presentation language throughout the dashboard. */
+.section-kicker{color:var(--vpink) !important;}
+.status-strip.healthy,.health-pill{background:#E7F8EF !important;color:var(--vgreen3) !important;}
+.status-strip.warning{background:#FFF5E1 !important;color:#A96812 !important;}
+.status-strip.critical{background:#FFF0F3 !important;color:var(--vred) !important;}
+.dash-insight{background:linear-gradient(105deg,#EAF9F1,#FFF1F8,#FFF7E9) !important;border-color:#E6D3DD !important;}
+
+/* ===== FINAL VIBRANT MEDIUM-GREEN THEME ===== */
+:root{
+    --vgreen:#18B86A;
+    --vgreen2:#31D487;
+    --vgreen3:#0C8F55;
+    --vpink:#D83F83;
+    --vorange:#E79A22;
+    --vred:#E05267;
+    --vline:#DCEAE3;
+}
+
+/* Keep the dashboard medium-green, fresh and vibrant without making it neon. */
+html,body{background:#F4FAF7!important;}
+.dashboard-body{background:linear-gradient(135deg,#F4FAF7 0%,#F9FCFA 55%,#FFF7FA 100%)!important;color:#17352B!important;}
+.main-content{background:transparent!important;}
+.sidebar{background:linear-gradient(180deg,#FFFFFF 0%,#F8FCFA 100%)!important;border-right:1px solid #D8E8E0!important;box-shadow:8px 0 30px rgba(23,53,43,.07)!important;}
+.sidebar-logo{display:none!important;}
+.nav-section{color:#789087!important;}
+.nav-link{color:#4D6A5F!important;}
+.nav-link:hover{background:#EAF8F1!important;color:#17352B!important;border-color:#CFEBDD!important;transform:translateX(3px)!important;}
+.nav-link.active{background:linear-gradient(90deg,#E4F8ED,#FFF1F7)!important;color:#17352B!important;border:1px solid #C8E7D6!important;box-shadow:inset 4px 0 0 var(--vgreen),0 5px 16px rgba(23,53,43,.06)!important;}
+.logout-link{background:#FFF0F4!important;color:#B63B55!important;border-color:#F0CCD8!important;}
+
+/* Vibrant accent strips on cards. */
+.metric-card,.panel,.dash-panel,.station-card,.maintenance-card,.alert-card,.prediction-form-card,.prediction-list-panel,.analytics-panel,.analytics-chart-panel,.analytics-table,.component-stat,.station-metric,.alert-stat{
+    background:#FFFFFF!important;border-color:#FFFFFF!important;box-shadow:0 10px 28px rgba(23,53,43,.075)!important;
+}
+.metric-card:nth-child(3n+1),.dash-metric:nth-child(3n+1),.station-metric:nth-child(3n+1),.component-stat:nth-child(3n+1),.alert-stat:nth-child(3n+1){border-top:4px solid var(--vgreen)!important;}
+.metric-card:nth-child(3n+2),.dash-metric:nth-child(3n+2),.station-metric:nth-child(3n+2),.component-stat:nth-child(3n+2),.alert-stat:nth-child(3n+2){border-top:4px solid var(--vpink)!important;}
+.metric-card:nth-child(3n),.dash-metric:nth-child(3n),.station-metric:nth-child(3n),.component-stat:nth-child(3n),.alert-stat:nth-child(3n){border-top:4px solid var(--vorange)!important;}
+.metric-title,.section-kicker{color:#6A8278!important;}
+.section-kicker{color:var(--vpink)!important;}
+.metric-value{color:#17352B!important;}
+.metric-value.green{color:var(--vgreen3)!important;}.metric-value.pink{color:var(--vpink)!important;}.metric-value.orange{color:#B96F08!important;}
+
+/* Buttons use a visible medium-green gradient instead of flat green. */
+button,.btn,.analytics-load,.login-btn{
+    background:linear-gradient(135deg,#0B9959 0%,#18B86A 48%,#35D487 100%)!important;
+    color:#FFFFFF!important;border-color:transparent!important;box-shadow:0 9px 22px rgba(24,184,106,.23)!important;
+}
+button:hover,.btn:hover,.analytics-load:hover,.login-btn:hover{
+    background:linear-gradient(135deg,#087C49 0%,#13AA62 48%,#2DC97B 100%)!important;
+    transform:translateY(-1px);box-shadow:0 12px 26px rgba(24,184,106,.28)!important;
+}
+
+.status-strip.healthy,.health-pill{background:#E5F8EE!important;color:#0C8F55!important;}
+.status-strip.warning{background:#FFF4DD!important;color:#A96812!important;}
+.status-strip.critical{background:#FFF0F3!important;color:#D23F57!important;}
+.dash-insight{background:linear-gradient(105deg,#E8FAF0 0%,#FFF1F7 55%,#FFF7E7 100%)!important;border-color:#E5D5DE!important;}
+
+/* ===== LOGIN: REFLECTIVE VIBRANT GREEN ===== */
+.login-body{
+    min-height:100vh!important;
+    position:relative!important;
+    overflow:hidden!important;
+    background:
+      radial-gradient(circle at 18% 16%,rgba(142,255,195,.58),transparent 23%),
+      radial-gradient(circle at 78% 24%,rgba(255,255,255,.18),transparent 17%),
+      radial-gradient(circle at 86% 82%,rgba(255,255,255,.16),transparent 23%),
+      linear-gradient(125deg,#078A4D 0%,#0FAE63 28%,#22D47D 55%,#16BC6C 76%,#079653 100%)!important;
+}
+.login-body::before{
+    content:"";
+    position:absolute!important;
+    inset:-35% -15%!important;
+    pointer-events:none!important;
+    background:linear-gradient(118deg,transparent 38%,rgba(255,255,255,.12) 46%,rgba(255,255,255,.24) 50%,rgba(255,255,255,.08) 54%,transparent 62%)!important;
+    transform:rotate(-4deg)!important;
+}
+.login-container,.login-navbar{position:relative!important;z-index:1!important;}
+.login-navbar-empty{height:0!important;padding:0!important;border:0!important;background:transparent!important;}
+.login-card{
+    background:rgba(255,255,255,.98)!important;border:1px solid rgba(255,255,255,.90)!important;
+    box-shadow:0 30px 80px rgba(5,74,47,.28),0 0 0 1px rgba(255,255,255,.18)!important;
+}
+.login-card h1{color:#17352B!important;}
+.login-card p{color:#72877F!important;}
+.login-card label{color:#355B4B!important;}
+.login-card input{background:#F7FCF9!important;border:1px solid #CBE4D7!important;color:#17352B!important;}
+.login-card input:focus{border-color:#18B86A!important;box-shadow:0 0 0 3px rgba(24,184,106,.14)!important;}
+.login-card input::placeholder{color:#81968D!important;}
+.login-link{color:#71877D!important;}
+.login-link a{color:#D83F83!important;}
+.error{background:#FFF0F3!important;border-color:#F2B9C5!important;color:#D23F57!important;}
+
+/* ===== FAILURE HISTORY: SAME WHITE CARD LANGUAGE AS THE REST OF THE DASHBOARD ===== */
+.failure-page-header h1{color:#17352B!important;}
+.failure-stat{background:#FFFFFF!important;border:1px solid #FFFFFF!important;box-shadow:0 10px 28px rgba(23,53,43,.075)!important;}
+.failure-stat.total{border-top:4px solid var(--vpink)!important;}
+.failure-stat.resolved{border-top:4px solid var(--vgreen)!important;}
+.failure-stat.unresolved{border-top:4px solid var(--vorange)!important;}
+.failure-stat-label{color:#71877D!important;}
+.failure-stat-number{color:#17352B!important;}
+.failure-panel{background:#FFFFFF!important;border:1px solid #FFFFFF!important;box-shadow:0 10px 28px rgba(23,53,43,.075)!important;}
+.failure-panel-kicker{color:var(--vpink)!important;}
+.failure-panel-header h2{color:#17352B!important;}
+.failure-count{color:#61786E!important;background:#F5F9F7!important;border-color:#DCE9E3!important;}
+.failure-card{background:#F8FCFA!important;border:1px solid #DCEAE3!important;box-shadow:none!important;}
+.failure-card:hover{border-color:#BFE5D1!important;box-shadow:0 8px 20px rgba(23,53,43,.06)!important;}
+.failure-type{color:#17352B!important;}
+.failure-station,.failure-description{color:#6E847A!important;}
+.failure-detail{background:#FFFFFF!important;border:1px solid #E1ECE7!important;}
+.detail-label{color:#7A8E86!important;}.detail-value{color:#355349!important;}
+.failure-icon.resolved{color:#0C8F55!important;background:#E8F9F0!important;border-color:#BFE6D1!important;}
+.failure-icon.unresolved{color:#D23F57!important;background:#FFF0F3!important;border-color:#F0C5CE!important;}
+.failure-status.resolved{color:#0C8F55!important;background:#E8F9F0!important;border-color:#BFE6D1!important;}
+.failure-status.unresolved{color:#D23F57!important;background:#FFF0F3!important;border-color:#F0C5CE!important;}
+
+
+/* =========================================================
+   DAY / NIGHT DASHBOARD THEME
+   Day is the existing presentation theme. Night is an
+   intentionally darker counterpart with the same green,
+   pink and orange accents.
+   ========================================================= */
+.theme-toggle-wrap{
+    margin:0 6px 18px;
+    padding:10px;
+    border:1px solid #DDEBE4;
+    border-radius:14px;
+    background:linear-gradient(135deg,#F7FCF9,#FFF8FB);
+}
+.theme-toggle{
+    width:100%;
+    display:flex!important;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 12px!important;
+    border:1px solid #CFE5D9!important;
+    border-radius:11px!important;
+    background:#FFFFFF!important;
+    color:#17352B!important;
+    box-shadow:0 5px 14px rgba(23,53,43,.06)!important;
+    cursor:pointer;
+    font-size:12px!important;
+    font-weight:800!important;
+    letter-spacing:.2px;
+}
+.theme-toggle:hover{transform:none!important;box-shadow:0 7px 18px rgba(23,53,43,.10)!important;}
+.theme-toggle-dot{
+    width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto;
+    background:linear-gradient(135deg,#0B9959,#35D487);
+    box-shadow:0 0 0 4px rgba(24,184,106,.12),0 0 12px rgba(24,184,106,.32);
+}
+.theme-toggle-label{display:flex;align-items:center;gap:9px;}
+.theme-toggle-state{color:#D83F83;font-size:10px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;}
+
+/* NIGHT MODE */
+body.night-mode{
+    background:radial-gradient(circle at 75% 0%,rgba(216,63,131,.10),transparent 28%),radial-gradient(circle at 12% 25%,rgba(24,184,106,.10),transparent 32%),linear-gradient(135deg,#071A12 0%,#0A2118 52%,#11151D 100%)!important;
+    color:#EAF7F0!important;
+}
+body.night-mode .main-content{background:transparent!important;color:#EAF7F0!important;}
+body.night-mode .sidebar{
+    background:linear-gradient(180deg,#0A2118 0%,#0D1916 58%,#15131B 100%)!important;
+    border-right-color:#1D4937!important;
+    box-shadow:9px 0 30px rgba(0,0,0,.20)!important;
+}
+body.night-mode .nav-section{color:#789F90!important;}
+body.night-mode .nav-link{color:#B9D2C6!important;}
+body.night-mode .nav-link:hover{background:#123225!important;color:#F2FFF7!important;border-color:#24513F!important;}
+body.night-mode .nav-link.active{
+    background:linear-gradient(90deg,rgba(24,184,106,.22),rgba(216,63,131,.13))!important;
+    color:#F1FFF7!important;border-color:#2A644B!important;
+    box-shadow:inset 4px 0 0 #31D487,0 6px 18px rgba(0,0,0,.16)!important;
+}
+body.night-mode .logout-link{background:rgba(224,82,103,.12)!important;color:#FF9BA9!important;border-color:#63313D!important;}
+body.night-mode .theme-toggle-wrap{background:linear-gradient(135deg,#102B20,#21151D)!important;border-color:#294C3D!important;}
+body.night-mode .theme-toggle{background:#132A21!important;color:#EAF7F0!important;border-color:#315B48!important;}
+body.night-mode .theme-toggle-state{color:#F08DB7!important;}
+body.night-mode .theme-toggle-dot{background:linear-gradient(135deg,#F0A52B,#FFCF68);box-shadow:0 0 0 4px rgba(240,165,43,.13),0 0 12px rgba(240,165,43,.28);}
+
+body.night-mode .page-title,
+body.night-mode .page-top h1,
+body.night-mode .stations-page-head h1,
+body.night-mode .failure-page-header h1,
+body.night-mode .modern-page-heading h1,
+body.night-mode .analytics-heading h1,
+body.night-mode .ops-title,
+body.night-mode h1,
+body.night-mode h2,
+body.night-mode h3,
+body.night-mode h4{color:#F1FFF7!important;}
+body.night-mode .page-subtitle,
+body.night-mode .analytics-panel-sub,
+body.night-mode .analytics-chart-sub,
+body.night-mode .prediction-form-subtitle,
+body.night-mode .prediction-list-subtitle,
+body.night-mode .failure-description,
+body.night-mode .failure-station,
+body.night-mode .maintenance-detail,
+body.night-mode .station-card-location,
+body.night-mode .station-tip,
+body.night-mode .telemetry-panel-subtitle,
+body.night-mode .ops-record-card p{color:#9DB7AA!important;}
+
+body.night-mode .metric-card,
+body.night-mode .panel,
+body.night-mode .dash-panel,
+body.night-mode .station-card,
+body.night-mode .maintenance-card,
+body.night-mode .alert-card,
+body.night-mode .prediction-form-card,
+body.night-mode .prediction-list-panel,
+body.night-mode .analytics-panel,
+body.night-mode .analytics-chart-panel,
+body.night-mode .analytics-table,
+body.night-mode .component-stat,
+body.night-mode .station-metric,
+body.night-mode .alert-stat,
+body.night-mode .battery-hero-card,
+body.night-mode .trend-panel,
+body.night-mode .telemetry-panel,
+body.night-mode .telemetry-table-panel,
+body.night-mode .type-panel,
+body.night-mode .ops-panel,
+body.night-mode .failure-panel,
+body.night-mode .failure-stat{
+    background:linear-gradient(145deg,#102A20 0%,#0D211A 100%)!important;
+    border-color:#1E4636!important;
+    box-shadow:0 12px 30px rgba(0,0,0,.22)!important;
+}
+body.night-mode .dash-insight{background:linear-gradient(105deg,#123326 0%,#251A27 55%,#2A2114 100%)!important;border-color:#3A3A31!important;}
+body.night-mode .failure-card,
+body.night-mode .ops-record-card,
+body.night-mode .telemetry-table-wrap,
+body.night-mode .data-table-wrap,
+body.night-mode .table-panel,
+body.night-mode .analytics-table-wrap{
+    background:#11271F!important;border-color:#28513F!important;
+}
+body.night-mode .metric-title,
+body.night-mode .dash-metric-label,
+body.night-mode .station-metric-label,
+body.night-mode .component-stat-label,
+body.night-mode .alert-stat-label,
+body.night-mode .failure-stat-label,
+body.night-mode .telemetry-stat-label,
+body.night-mode .detail-label,
+body.night-mode .failure-detail .detail-label,
+body.night-mode .station-info-label{color:#86A397!important;}
+body.night-mode .metric-value,
+body.night-mode .dash-metric-value,
+body.night-mode .station-metric-value,
+body.night-mode .component-stat-number,
+body.night-mode .alert-stat-number,
+body.night-mode .failure-stat-number,
+body.night-mode .telemetry-stat-value,
+body.night-mode .prediction-stat-number{color:#F1FFF7!important;}
+body.night-mode .failure-type,
+body.night-mode .failure-panel-header h2,
+body.night-mode .failure-count,
+body.night-mode .ops-panel-title,
+body.night-mode .ops-record-card h3,
+body.night-mode .analytics-row strong,
+body.night-mode .detail-value,
+body.night-mode .ops-date strong,
+body.night-mode .ops-detail strong{color:#DCEDE5!important;}
+body.night-mode .failure-count{background:#173027!important;border-color:#2A4D40!important;color:#A7BEB4!important;}
+body.night-mode .failure-detail,
+body.night-mode .ops-detail,
+body.night-mode .ops-date{background:#0E211A!important;border-color:#244A3A!important;}
+body.night-mode .failure-icon.resolved{color:#6FE1AF!important;background:rgba(49,212,135,.12)!important;border-color:#28694D!important;}
+body.night-mode .failure-icon.unresolved{color:#FF93A1!important;background:rgba(224,82,103,.13)!important;border-color:#66343E!important;}
+body.night-mode .failure-status.resolved{color:#6FE1AF!important;background:rgba(49,212,135,.10)!important;border-color:#28694D!important;}
+body.night-mode .failure-status.unresolved{color:#FF93A1!important;background:rgba(224,82,103,.10)!important;border-color:#66343E!important;}
+body.night-mode .health-legend,
+body.night-mode .health-text,
+body.night-mode .health-detail,
+body.night-mode .metric-row,
+body.night-mode .station-tip-title{color:#B4CBC0!important;}
+body.night-mode .health-summary,
+body.night-mode .prediction-readings,
+body.night-mode .prediction-stat,
+body.night-mode .maintenance-detail,
+body.night-mode .station-card-divider{border-color:#244A3A!important;background-color:transparent!important;}
+body.night-mode input,
+body.night-mode select,
+body.night-mode textarea{
+    background:#0B1D16!important;color:#EAF7F0!important;border-color:#2B5643!important;
+}
+body.night-mode input::placeholder,
+body.night-mode textarea::placeholder{color:#6F8D80!important;}
+body.night-mode label{color:#BFD7CA!important;}
+body.night-mode .table th{background:#123126!important;color:#9DB7AA!important;}
+body.night-mode .table td{background:#0F241C!important;color:#C8DDD3!important;border-color:#234738!important;}
+body.night-mode .table tr:hover td{background:#15352A!important;}
+body.night-mode .analytics-line,
+body.night-mode .heading-line{opacity:.85;}
+body.night-mode .status-strip.healthy,
+body.night-mode .health-pill{background:rgba(49,212,135,.14)!important;color:#75E4B4!important;border-color:#28694D!important;}
+body.night-mode .status-strip.warning{background:rgba(231,154,34,.14)!important;color:#FFD27A!important;border-color:#6D5425!important;}
+body.night-mode .status-strip.critical{background:rgba(224,82,103,.14)!important;color:#FF9AA8!important;border-color:#693641!important;}
+body.night-mode .badge{background:#18372B!important;color:#AEE8CC!important;border-color:#2A5A45!important;}
+body.night-mode .empty-alerts,
+body.night-mode .stations-empty,
+body.night-mode .telemetry-empty,
+body.night-mode .ops-empty,
+body.night-mode .failure-empty{background:#0E211A!important;border-color:#2B5142!important;color:#8FA99E!important;}
+
+/* Keep green/pink/orange accents visible in night mode. */
+body.night-mode .section-kicker,
+body.night-mode .failure-panel-kicker{color:#F08DB7!important;}
+body.night-mode .metric-value.green{color:#5FE0A4!important;}
+body.night-mode .metric-value.pink{color:#F08DB7!important;}
+body.night-mode .metric-value.orange{color:#FFC45C!important;}
+body.night-mode .dash-metric:nth-child(3n+1),body.night-mode .station-metric:nth-child(3n+1),body.night-mode .component-stat:nth-child(3n+1),body.night-mode .alert-stat:nth-child(3n+1){border-top-color:#31D487!important;}
+body.night-mode .dash-metric:nth-child(3n+2),body.night-mode .station-metric:nth-child(3n+2),body.night-mode .component-stat:nth-child(3n+2),body.night-mode .alert-stat:nth-child(3n+2){border-top-color:#F08DB7!important;}
+body.night-mode .dash-metric:nth-child(3n),body.night-mode .station-metric:nth-child(3n),body.night-mode .component-stat:nth-child(3n),body.night-mode .alert-stat:nth-child(3n){border-top-color:#F2B64A!important;}
+
+@media(max-width:650px){
+    .theme-toggle-wrap{margin:8px 6px 14px;}
+}
+
+/* =========================================================
+   NIGHT MODE — HIGH CONTRAST CONTENT FIX
+   Keep dark surfaces dark, but make every number/label/text
+   bright enough to read. Accent values stay green/pink/orange.
+   ========================================================= */
+body.night-mode .dash-metric,
+body.night-mode .station-metric,
+body.night-mode .component-stat,
+body.night-mode .alert-stat{
+    background:linear-gradient(145deg,#102E21 0%,#0B2419 100%) !important;
+    border-color:#245B43 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}
+
+body.night-mode .dash-metric-label,
+body.night-mode .station-metric-label,
+body.night-mode .component-stat-label,
+body.night-mode .alert-stat-label,
+body.night-mode .telemetry-stat-label{
+    color:#A7C9BA !important;
+}
+
+body.night-mode .dash-metric-value,
+body.night-mode .station-metric-value,
+body.night-mode .component-stat-number,
+body.night-mode .alert-stat-number,
+body.night-mode .telemetry-stat-value{
+    color:#F3FFF8 !important;
+    text-shadow:0 0 14px rgba(49,212,135,.10);
+}
+body.night-mode .dash-metric:nth-child(1) .dash-metric-value,
+body.night-mode .dash-metric:nth-child(5) .dash-metric-value,
+body.night-mode .dash-metric:nth-child(8) .dash-metric-value,
+body.night-mode .station-metric-value.green{
+    color:#62E6A9 !important;
+}
+body.night-mode .dash-metric:nth-child(2) .dash-metric-value,
+body.night-mode .dash-metric:nth-child(4) .dash-metric-value,
+body.night-mode .dash-metric:nth-child(6) .dash-metric-value,
+body.night-mode .station-metric-value.pink{
+    color:#FF91C0 !important;
+}
+body.night-mode .dash-metric:nth-child(3) .dash-metric-value,
+body.night-mode .dash-metric:nth-child(7) .dash-metric-value{
+    color:#FFC45C !important;
+}
+
+/* Charging Stations page: the main white container also needs its night shade. */
+body.night-mode .stations-panel{
+    background:linear-gradient(145deg,#102E21 0%,#0B2419 100%) !important;
+    border-color:#245B43 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}
+body.night-mode .stations-panel h2{color:#F1FFF7 !important;}
+body.night-mode .stations-panel-subtitle{color:#A1BDB1 !important;}
+body.night-mode .station-count-pill{
+    color:#FF91C0 !important;
+    background:rgba(216,63,131,.10) !important;
+    border-color:rgba(216,63,131,.30) !important;
+}
+body.night-mode .station-card{
+    background:linear-gradient(145deg,#12372A 0%,#0D2A20 100%) !important;
+    border-color:#2B654C !important;
+    box-shadow:0 10px 24px rgba(0,0,0,.20) !important;
+}
+body.night-mode .station-card:hover{
+    border-color:#49D991 !important;
+}
+body.night-mode .station-number{color:#A4C3B6 !important;}
+body.night-mode .station-status{
+    color:#69E6AD !important;
+    background:rgba(49,212,135,.12) !important;
+    border:1px solid rgba(49,212,135,.22) !important;
+}
+body.night-mode .station-status span{background:#49D991 !important;}
+body.night-mode .station-card-title{
+    color:#F1FFF7 !important;
+    text-shadow:0 0 12px rgba(255,255,255,.05);
+}
+body.night-mode .station-card-location{color:#B1C9BE !important;}
+body.night-mode .station-card-divider{background:#2A5544 !important;}
+body.night-mode .station-info-label{color:#8EADA0 !important;}
+body.night-mode .station-card-info strong{color:#E4F3EC !important;}
+body.night-mode .charger-tag.fast{
+    color:#FF91C0 !important;
+    background:rgba(216,63,131,.12) !important;
+}
+body.night-mode .charger-tag.ac,
+body.night-mode .charger-tag.standard{
+    color:#69E6AD !important;
+    background:rgba(49,212,135,.11) !important;
+}
+body.night-mode .type-summary-row{
+    background:#123025 !important;
+    border-color:#285340 !important;
+}
+body.night-mode .type-summary-row span{color:#A8C4B8 !important;}
+body.night-mode .type-summary-row strong{color:#FF91C0 !important;}
+body.night-mode .station-tip{
+    background:linear-gradient(135deg,#2A1822,#251D10) !important;
+    border-color:#5D3948 !important;
+}
+body.night-mode .station-tip-title{color:#FF91C0 !important;}
+body.night-mode .station-tip p{color:#B8CBC2 !important;}
+
+/* Dashboard panels and chart text. */
+body.night-mode .dash-panel{
+    background:linear-gradient(145deg,#102E21 0%,#0B2419 100%) !important;
+    border-color:#245B43 !important;
+}
+body.night-mode .dash-panel h2,
+body.night-mode .dash-panel h3{color:#F1FFF7 !important;}
+body.night-mode .dash-panel p,
+body.night-mode .dash-metric-note{color:#A8C3B8 !important;}
+
+
+
+/* =========================================================
+   FINAL PRESENTATION POLISH — NIGHT CONTRAST + HEADINGS
+   ========================================================= */
+
+/* Keep page headings clean, centered and comfortably spaced. */
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.main-content h4 {
+    line-height:1.08;
+    text-wrap:balance;
+}
+
+.stations-page-head,
+.telemetry-page-head,
+.failure-page-header {
+    min-height:74px;
+    margin:4px 0 30px !important;
+    padding:0 10px;
+}
+
+.stations-page-head h1,
+.telemetry-page-head h1,
+.failure-page-header h1 {
+    margin:0 !important;
+    font-size:clamp(32px,4vw,46px) !important;
+    line-height:1.08 !important;
+    letter-spacing:-1.5px !important;
+}
+
+.ops-title-wrap {
+    margin:4px 0 34px !important;
+    padding:0 10px;
+}
+.ops-title {
+    font-size:clamp(32px,4vw,44px) !important;
+    line-height:1.08 !important;
+    letter-spacing:-1.4px !important;
+}
+
+.analytics-heading {
+    margin:4px 0 30px !important;
+    padding:0 10px;
+}
+.analytics-heading h1 {
+    font-size:clamp(32px,4vw,44px) !important;
+    line-height:1.08 !important;
+    letter-spacing:-1.4px !important;
+}
+
+.modern-page-heading {
+    padding-top:2px !important;
+    margin-bottom:30px !important;
+}
+.modern-page-heading h1 {
+    font-size:clamp(32px,4vw,44px) !important;
+    line-height:1.08 !important;
+    letter-spacing:-1.4px !important;
+}
+
+/* Generic operations pages: medium-green night cards instead of white cards. */
+body.night-mode .ops-stat {
+    background:linear-gradient(145deg,#12382A 0%,#0D291F 100%) !important;
+    border-color:#2B7454 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}
+body.night-mode .ops-stat span {
+    color:#A9CDBD !important;
+}
+body.night-mode .ops-stat strong {
+    color:#F4FFF9 !important;
+}
+body.night-mode .ops-stat:nth-child(1) strong,
+body.night-mode .ops-stat:nth-child(2) strong {
+    color:#63F0AB !important;
+}
+body.night-mode .ops-stat:nth-child(3) strong {
+    color:#FFC55A !important;
+}
+body.night-mode .ops-stat:nth-child(4) strong {
+    color:#FF8FC5 !important;
+}
+
+/* Analytics metric cards: same night treatment as Dashboard/Stations. */
+body.night-mode .analytics-metric {
+    background:linear-gradient(145deg,#12382A 0%,#0D291F 100%) !important;
+    border-color:#2B7454 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}
+body.night-mode .analytics-metric span {
+    color:#A9CDBD !important;
+}
+body.night-mode .analytics-metric strong {
+    color:#F4FFF9 !important;
+}
+body.night-mode .analytics-metric:nth-child(3n+1) strong { color:#63F0AB !important; }
+body.night-mode .analytics-metric:nth-child(3n+2) strong { color:#FF8FC5 !important; }
+body.night-mode .analytics-metric:nth-child(3n) strong { color:#FFC55A !important; }
+
+/* Analytics selector and its controls. */
+body.night-mode .analytics-selector {
+    background:linear-gradient(145deg,#12382A 0%,#0D291F 100%) !important;
+    border:1px solid #2B7454 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}
+body.night-mode .analytics-selector label { color:#A9CDBD !important; }
+body.night-mode .analytics-selector select {
+    background:#0A2118 !important;
+    color:#F4FFF9 !important;
+    border-color:#317857 !important;
+}
+
+/* Analytics panels and table become consistent dark-green surfaces. */
+body.night-mode .analytics-panel,
+body.night-mode .analytics-table {
+    background:linear-gradient(145deg,#12382A 0%,#0D291F 100%) !important;
+    border-color:#2B7454 !important;
+}
+body.night-mode .analytics-panel h2,
+body.night-mode .analytics-table h2 {
+    color:#F4FFF9 !important;
+}
+body.night-mode .analytics-row {
+    color:#9DBDB0 !important;
+    border-color:#285542 !important;
+}
+body.night-mode .analytics-row strong { color:#EAF8F1 !important; }
+body.night-mode .analytics-table th {
+    background:#173B2D !important;
+    color:#BBD9CA !important;
+}
+body.night-mode .analytics-table td {
+    background:#102D22 !important;
+    color:#DCEDE5 !important;
+    border-color:#234D3B !important;
+}
+body.night-mode .health-donut:after { background:#0B2118 !important; }
+body.night-mode .health-center strong { color:#F4FFF9 !important; }
+body.night-mode .health-center span { color:#A9CDBD !important; }
+body.night-mode .health-legend div { color:#BBD9CA !important; }
+
+/* Generic record pages: make every card readable in Night Mode. */
+body.night-mode .ops-record-card h3 { color:#F4FFF9 !important; }
+body.night-mode .ops-record-card p { color:#A7C4B7 !important; }
+body.night-mode .ops-panel-title { color:#F4FFF9 !important; }
+body.night-mode .ops-count { color:#9DBDB0 !important; }
+body.night-mode .ops-panel-kicker,
+body.night-mode .ops-kicker { color:#FF8FC5 !important; }
+body.night-mode .ops-date,
+body.night-mode .ops-detail {
+    background:#0E241B !important;
+    border-color:#285542 !important;
+}
+body.night-mode .ops-date span,
+body.night-mode .ops-detail span { color:#7FA596 !important; }
+body.night-mode .ops-date strong,
+body.night-mode .ops-detail strong { color:#E2F2EA !important; }
+
+/* Headings stay bright in Night Mode without becoming washed out. */
+body.night-mode .stations-page-head h1,
+body.night-mode .telemetry-page-head h1,
+body.night-mode .failure-page-header h1,
+body.night-mode .ops-title,
+body.night-mode .analytics-heading h1,
+body.night-mode .modern-page-heading h1,
+body.night-mode .dashboard-hero h1 {
+    color:#F5FFF9 !important;
+    text-shadow:0 1px 0 rgba(255,255,255,.03);
+}
+
+/* Keep page spacing stable on smaller screens. */
+@media(max-width:720px){
+    .stations-page-head,
+    .telemetry-page-head,
+    .failure-page-header,
+    .ops-title-wrap,
+    .analytics-heading {
+        margin-bottom:24px !important;
+    }
+    .stations-page-head h1,
+    .telemetry-page-head h1,
+    .failure-page-header h1,
+    .ops-title,
+    .analytics-heading h1,
+    .modern-page-heading h1 {
+        font-size:32px !important;
+    }
+}
+
+
+/* =========================================================
+   FINAL HEADING + BATTERY NIGHT-MODE FIX
+   Prevent heading collisions on every page and keep the
+   Battery Performance metrics readable in Night Mode.
+   ========================================================= */
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.main-content h4 {
+    overflow-wrap:anywhere !important;
+    word-break:normal !important;
+    text-wrap:balance !important;
+}
+
+.main-content h1 {
+    line-height:1.12 !important;
+    margin-top:0 !important;
+    margin-bottom:10px !important;
+}
+
+.main-content h2 {
+    line-height:1.18 !important;
+    margin-top:0 !important;
+    margin-bottom:8px !important;
+}
+
+.main-content h3,
+.main-content h4 {
+    line-height:1.22 !important;
+    margin-top:0 !important;
+    margin-bottom:7px !important;
+}
+
+/* Give kicker labels and their headings a predictable gap. */
+.section-kicker,
+.panel-kicker,
+.ops-kicker,
+.ops-panel-kicker,
+.prediction-kicker,
+.failure-panel-kicker {
+    line-height:1.25 !important;
+    margin-bottom:8px !important;
+}
+
+.section-kicker + h1,
+.section-kicker + h2,
+.section-kicker + h3,
+.panel-kicker + h1,
+.panel-kicker + h2,
+.panel-kicker + h3,
+.ops-kicker + h1,
+.ops-kicker + h2,
+.ops-kicker + h3,
+.ops-panel-kicker + h1,
+.ops-panel-kicker + h2,
+.ops-panel-kicker + h3,
+.prediction-kicker + h1,
+.prediction-kicker + h2,
+.prediction-kicker + h3,
+.failure-panel-kicker + h1,
+.failure-panel-kicker + h2,
+.failure-panel-kicker + h3 {
+    margin-top:0 !important;
+}
+
+/* Panel headings: prevent text from crowding the kicker/subtitle. */
+.panel-title,
+.dash-panel-title,
+.prediction-form-title,
+.prediction-list-title,
+.ops-panel-title,
+.analytics-panel h2,
+.analytics-table h2 {
+    line-height:1.18 !important;
+    margin-top:0 !important;
+}
+
+.panel-heading-row {
+    align-items:flex-start !important;
+    margin-bottom:4px !important;
+}
+
+/* Battery Performance — explicit Night Mode contrast. */
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) {
+    background:linear-gradient(145deg,#12382A 0%,#0D291F 100%) !important;
+    border-color:#2B7454 !important;
+    color:#F4FFF9 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .section-kicker {
+    color:#FF8FC5 !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .panel-title {
+    color:#F4FFF9 !important;
+    line-height:1.18 !important;
+    margin:0 !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row {
+    background:linear-gradient(90deg,#102D22 0%,#0F291F 100%) !important;
+    border-color:#285743 !important;
+    color:#BBD9CA !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row div {
+    color:#BBD9CA !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row strong {
+    color:#F4FFF9 !important;
+    font-weight:900 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row:nth-child(1) strong,
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row:nth-child(4) strong {
+    color:#63F0AB !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row:nth-child(2) strong {
+    color:#FF8FC5 !important;
+}
+
+body.night-mode .battery-hero > .panel:not(.battery-hero-card) .metric-row:nth-child(3) strong {
+    color:#FFC55A !important;
+}
+
+/* Keep the existing Battery Health Trend graph readable in Night Mode. */
+body.night-mode .trend-panel .graph {
+    background:linear-gradient(180deg,rgba(49,212,135,.08),rgba(0,0,0,.10)) !important;
+    border-color:#285743 !important;
+}
+body.night-mode .trend-panel .trend-legend {
+    color:#BBD9CA !important;
+}
+
+/* =====================================================
+   HEALTH TREND SELECTOR + STATION SEARCH / HEALTH FILTER
+   ===================================================== */
+.trend-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.trend-select,.station-search,.station-filter{
+    appearance:none;-webkit-appearance:none;border:1px solid #CFE5D9;border-radius:10px;
+    background:#FFFFFF;color:#17352B;padding:9px 12px;font-family:inherit;font-size:11px;
+    font-weight:800;outline:none;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.trend-select:focus,.station-search:focus,.station-filter:focus{
+    border-color:#18B86A;box-shadow:0 0 0 3px rgba(24,184,106,.12);
+}
+.trend-select{min-width:170px;cursor:pointer;}
+.station-search{min-width:220px;flex:1 1 220px;}
+.station-filter{min-width:155px;cursor:pointer;}
+.station-filter-wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:min(100%,520px);}
+.station-filter-label{color:#789087;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;}
+.station-filter-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    margin-bottom:16px;padding:12px;border-radius:13px;
+    background:linear-gradient(90deg,#F4FAF7,#FFF6FA,#FFF9EF);border:1px solid #E2ECE7;
+}
+.station-filter-result{color:#6C8278;font-size:10px;font-weight:800;white-space:nowrap;}
+.station-card.is-hidden{display:none!important;}
+.station-health-badge{
+    display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:5px 8px;border-radius:999px;
+    font-size:8px;font-weight:900;letter-spacing:.6px;
+}
+.station-health-badge i{width:6px;height:6px;border-radius:50%;display:block;}
+.station-health-badge.healthy{color:#0C8F55;background:#E8F8F0;border:1px solid #C7E9D7;}
+.station-health-badge.healthy i{background:#18B86A;}
+.station-health-badge.moderate{color:#A96812;background:#FFF5E1;border:1px solid #F1D7A5;}
+.station-health-badge.moderate i{background:#E79A22;}
+.station-health-badge.critical{color:#C43B55;background:#FFF0F3;border:1px solid #F0C9D1;}
+.station-health-badge.critical i{background:#E05267;}
+.station-health-badge.no-data{color:#6C8278;background:#F2F6F4;border:1px solid #DCE8E2;}
+.station-health-badge.no-data i{background:#91A49E;}
+.stations-no-results{
+    display:none;grid-column:1/-1;padding:42px 20px;text-align:center;border:1px dashed #CFE0D8;
+    border-radius:14px;background:#FBFDFC;color:#71877D;
+}
+.stations-no-results strong{display:block;color:#17352B;font-size:15px;margin-bottom:5px;}
+body.night-mode .trend-select,body.night-mode .station-search,body.night-mode .station-filter{
+    background:#0A2118!important;color:#F2FFF8!important;border-color:#317857!important;
+}
+body.night-mode .station-filter-bar{background:linear-gradient(90deg,#102D22,#17231F,#21171E)!important;border-color:#2B7454!important;}
+body.night-mode .station-filter-label,body.night-mode .station-filter-result{color:#A9CDBD!important;}
+body.night-mode .stations-no-results{background:#0F2B21!important;border-color:#2B7454!important;color:#A7C4B7!important;}
+body.night-mode .stations-no-results strong{color:#F4FFF9!important;}
+body.night-mode .station-health-badge.healthy{color:#63F0AB!important;background:rgba(49,212,135,.14)!important;border-color:#2E8A61!important;}
+body.night-mode .station-health-badge.moderate{color:#FFC55A!important;background:rgba(231,154,34,.14)!important;border-color:#805C27!important;}
+body.night-mode .station-health-badge.critical{color:#FF91A2!important;background:rgba(224,82,103,.14)!important;border-color:#87414F!important;}
+body.night-mode .station-health-badge.no-data{color:#A7C4B7!important;background:#173027!important;border-color:#36594A!important;}
 
 </style>
 """
@@ -916,6 +1773,13 @@ def sidebar(active):
     return f"""
     <div class="sidebar">
         <div class="sidebar-logo"><span>EV CHARGING STATION<br>HEALTH CARE</span></div>
+
+        <div class="theme-toggle-wrap">
+            <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleDashboardTheme()">
+                <span class="theme-toggle-label"><span class="theme-toggle-dot"></span><span id="themeToggleText">Night Mode</span></span>
+                <span class="theme-toggle-state" id="themeToggleState">DAY</span>
+            </button>
+        </div>
 
         <div class="nav-section">OVERVIEW</div>
         <a href="/dashboard" class="nav-link {'active' if active == 'dashboard' else ''}"><span>Dashboard</span></a>
@@ -940,6 +1804,181 @@ def sidebar(active):
         <a href="/feedback" class="nav-link {'active' if active == 'feedback' else ''}"><span>Feedback</span></a>
         <a href="/logout" class="nav-link logout-link"><span>Logout</span></a>
     </div>
+    <script>
+    (function(){{
+        function applyNightOverrides(){{
+            var old = document.getElementById("nightModeOverrides");
+            if(old) old.remove();
+            if(localStorage.getItem("ev-dashboard-theme") !== "night") return;
+            var style = document.createElement("style");
+            style.id = "nightModeOverrides";
+            style.textContent = `
+/* =====================================================
+   NIGHT MODE — UNIVERSAL PAGE CONTRAST OVERRIDES
+   These rules are injected last so page-specific styles
+   cannot wash out text/numbers on dark surfaces.
+   ===================================================== */
+body.night-mode .telemetry-stat,
+body.night-mode .prediction-stat,
+body.night-mode .modern-prediction-card,
+body.night-mode .prediction-readings div,
+body.night-mode .prediction-list-panel,
+body.night-mode .telemetry-table-panel,
+body.night-mode .telemetry-table-wrap,
+body.night-mode .telemetry-panel,
+body.night-mode .maintenance-panel,
+body.night-mode .alerts-panel,
+body.night-mode .alert-card,
+body.night-mode .alert-stat,
+body.night-mode .analytics-panel,
+body.night-mode .analytics-chart-panel,
+body.night-mode .analytics-table,
+body.night-mode .analytics-table-wrap,
+body.night-mode .component-stat,
+body.night-mode .failure-panel,
+body.night-mode .failure-stat,
+body.night-mode .failure-card,
+body.night-mode .ops-panel,
+body.night-mode .ops-record-card,
+body.night-mode .table-panel,
+body.night-mode .data-table-wrap {{
+    background:linear-gradient(145deg,#12382A 0%,#0D291F 100%) !important;
+    color:#F4FFF9 !important;
+    border-color:#2B7454 !important;
+    box-shadow:0 12px 30px rgba(0,0,0,.24) !important;
+}}
+
+/* Telemetry — all four metric cards */
+body.night-mode .telemetry-stat-label {{ color:#A9CDBD !important; }}
+body.night-mode .telemetry-stat-value {{
+    color:#F4FFF9 !important;
+    text-shadow:0 0 12px rgba(255,255,255,.06) !important;
+}}
+body.night-mode .telemetry-stat-value.green {{ color:#63F0AB !important; }}
+body.night-mode .telemetry-stat-value.pink {{ color:#FF8FC5 !important; }}
+body.night-mode .telemetry-stat-value.orange {{ color:#FFC55A !important; }}
+body.night-mode .telemetry-panel h2,
+body.night-mode .telemetry-panel h3 {{ color:#F4FFF9 !important; }}
+body.night-mode .telemetry-panel p,
+body.night-mode .telemetry-panel-subtitle,
+body.night-mode .telemetry-chart-subtitle {{ color:#A7C4B7 !important; }}
+body.night-mode .telemetry-table {{ color:#E9F8F1 !important; }}
+body.night-mode .telemetry-table th {{ background:#173B2D !important; color:#BBD9CA !important; border-color:#285542 !important; }}
+body.night-mode .telemetry-table td {{ background:#102D22 !important; color:#DCEDE5 !important; border-color:#234D3B !important; }}
+body.night-mode .telemetry-table tbody tr:hover td {{ background:#174332 !important; }}
+body.night-mode .telemetry-id {{ color:#63F0AB !important; }}
+
+/* Predictions — history cards and readings */
+body.night-mode .prediction-list-title,
+body.night-mode .modern-prediction-card h3 {{ color:#F4FFF9 !important; }}
+body.night-mode .prediction-list-subtitle,
+body.night-mode .prediction-station {{ color:#A8C7B9 !important; }}
+body.night-mode .prediction-kicker {{ color:#63F0AB !important; }}
+body.night-mode .prediction-stat-label {{ color:#A9CDBD !important; }}
+body.night-mode .prediction-stat-number {{ color:#F4FFF9 !important; }}
+body.night-mode .prediction-stat:nth-child(2) .prediction-stat-number {{ color:#63F0AB !important; }}
+body.night-mode .prediction-stat:nth-child(3) .prediction-stat-number {{ color:#FFC55A !important; }}
+body.night-mode .prediction-stat:nth-child(4) .prediction-stat-number {{ color:#FF8FC5 !important; }}
+body.night-mode .prediction-readings div {{ background:#0F2B21 !important; border-color:#285743 !important; }}
+body.night-mode .prediction-readings span {{ color:#91B4A5 !important; }}
+body.night-mode .prediction-readings strong {{ color:#F0FFF7 !important; }}
+body.night-mode .modern-status.prediction-good {{ color:#63F0AB !important; background:rgba(49,212,135,.14) !important; border-color:#2E8A61 !important; }}
+body.night-mode .modern-status.prediction-danger {{ color:#FF91A2 !important; background:rgba(224,82,103,.14) !important; border-color:#87414F !important; }}
+body.night-mode .modern-status.prediction-other {{ color:#FF8FC5 !important; background:rgba(216,63,131,.14) !important; border-color:#7A3C5C !important; }}
+
+/* Generic page text on night cards */
+body.night-mode .panel-title,
+body.night-mode .panel-heading-row h2,
+body.night-mode .section-title,
+body.night-mode .card-title,
+body.night-mode .station-card-title,
+body.night-mode .maintenance-title,
+body.night-mode .alert-title,
+body.night-mode .alert-message,
+body.night-mode .analytics-panel h2,
+body.night-mode .analytics-chart-panel h2,
+body.night-mode .maintenance-panel h2,
+body.night-mode .alerts-panel h2,
+body.night-mode .ops-panel-title {{ color:#F4FFF9 !important; }}
+body.night-mode .panel-subtitle,
+body.night-mode .panel-sub,
+body.night-mode .maintenance-id,
+body.night-mode .alert-meta,
+body.night-mode .record-count,
+body.night-mode .analytics-panel-sub,
+body.night-mode .analytics-chart-sub,
+body.night-mode .maintenance-detail span,
+body.night-mode .maintenance-detail,
+body.night-mode .ops-record-card p {{ color:#A7C4B7 !important; }}
+
+/* Form controls and buttons */
+body.night-mode .prediction-form-card label,
+body.night-mode .prediction-field label,
+body.night-mode form label {{ color:#BBD9CA !important; }}
+body.night-mode .prediction-form-card input,
+body.night-mode .prediction-form-card select,
+body.night-mode .prediction-field input,
+body.night-mode .prediction-field select,
+body.night-mode input,
+body.night-mode select,
+body.night-mode textarea {{
+    background:#0A2118 !important;
+    color:#F2FFF8 !important;
+    border-color:#317857 !important;
+}}
+body.night-mode input::placeholder,
+body.night-mode textarea::placeholder {{ color:#729789 !important; }}
+
+/* Make every prominent numeric value readable */
+body.night-mode strong,
+body.night-mode .metric-value,
+body.night-mode .metric-card strong,
+body.night-mode .dash-metric-value,
+body.night-mode .station-metric-value,
+body.night-mode .component-stat-number,
+body.night-mode .alert-stat-number,
+body.night-mode .failure-stat-number,
+body.night-mode .prediction-stat-number,
+body.night-mode .analytics-metric strong {{ color:#F4FFF9 !important; }}
+body.night-mode .metric-value.green,
+body.night-mode .dash-metric-value.green {{ color:#63F0AB !important; }}
+body.night-mode .metric-value.pink,
+body.night-mode .dash-metric-value.pink {{ color:#FF8FC5 !important; }}
+body.night-mode .metric-value.orange,
+body.night-mode .dash-metric-value.orange {{ color:#FFC55A !important; }}
+
+/* Keep headings bright and accents saturated */
+body.night-mode h1,body.night-mode h2,body.night-mode h3,body.night-mode h4,
+body.night-mode .page-title,body.night-mode .modern-page-heading h1,
+body.night-mode .analytics-heading h1,body.night-mode .stations-page-head h1,
+body.night-mode .failure-page-header h1 {{ color:#F4FFF9 !important; }}
+body.night-mode .section-kicker,body.night-mode .failure-panel-kicker {{ color:#FF8FC5 !important; }}
+body.night-mode .analytics-line,body.night-mode .heading-line {{ opacity:1 !important; }}
+`;
+            document.head.appendChild(style);
+        }}
+
+        function applyDashboardTheme(){{
+            var isNight = localStorage.getItem("ev-dashboard-theme") === "night";
+            document.body.classList.toggle("night-mode", isNight);
+            applyNightOverrides();
+            var text = document.getElementById("themeToggleText");
+            var state = document.getElementById("themeToggleState");
+            if(text) text.textContent = isNight ? "Day Mode" : "Night Mode";
+            if(state) state.textContent = isNight ? "NIGHT" : "DAY";
+        }}
+        window.toggleDashboardTheme = function(){{
+            var isNight = document.body.classList.toggle("night-mode");
+            localStorage.setItem("ev-dashboard-theme", isNight ? "night" : "day");
+            applyNightOverrides();
+            var text = document.getElementById("themeToggleText");
+            var state = document.getElementById("themeToggleState");
+            if(text) text.textContent = isNight ? "Day Mode" : "Night Mode";
+            if(state) state.textContent = isNight ? "NIGHT" : "DAY";
+        }};
+        applyDashboardTheme();
+    }})();
+    </script>
     """
 
 
@@ -1234,11 +2273,7 @@ def login():
 
         <body class="login-body">
 
-            <div class="login-navbar">
-                <div class="login-brand">
-                    <span>EV CHARGING STATION HEALTH CARE</span>
-                </div>
-            </div>
+            <div class="login-navbar login-navbar-empty"></div>
 
             <div class="login-container">
 
@@ -1347,11 +2382,7 @@ def register():
 
         <body class="login-body">
 
-            <div class="login-navbar">
-                <div class="login-brand">
-                    <span>EV CHARGING STATION HEALTH CARE</span>
-                </div>
-            </div>
+            <div class="login-navbar login-navbar-empty"></div>
 
             <div class="login-container">
 
@@ -2066,9 +3097,23 @@ def stations():
     try:
         stations_data = conn.execute(
             """
-            SELECT id, station_name, charger_type, location
-            FROM charging_stations
-            ORDER BY id ASC
+            SELECT
+                c.id,
+                c.station_name,
+                c.charger_type,
+                c.location,
+                t.temperature AS latest_temperature,
+                t.power_consumption AS latest_power
+            FROM charging_stations c
+            LEFT JOIN telemetry t
+                ON t.id = (
+                    SELECT id
+                    FROM telemetry
+                    WHERE charging_station_id = c.id
+                    ORDER BY id DESC
+                    LIMIT 1
+                )
+            ORDER BY c.id ASC
         """
         ).fetchall()
 
@@ -2102,6 +3147,27 @@ def stations():
 
         charger_lower = charger_type.lower()
 
+        latest_temperature = station["latest_temperature"]
+        latest_power = station["latest_power"]
+        if latest_temperature is None and latest_power is None:
+            health_value = None
+            health_status = "NO DATA"
+            health_class = "no-data"
+        else:
+            health_value = calculate_health(
+                float(latest_temperature or 0),
+                float(latest_power or 0),
+            )
+            if health_value >= 80:
+                health_status = "HEALTHY"
+                health_class = "healthy"
+            elif health_value >= 60:
+                health_status = "MODERATE"
+                health_class = "moderate"
+            else:
+                health_status = "CRITICAL"
+                health_class = "critical"
+
         if "dc" in charger_lower or "fast" in charger_lower:
             charger_class = "fast"
             charger_icon = ""
@@ -2116,7 +3182,11 @@ def stations():
             charger_label = "CHARGING POINT"
 
         station_cards += f"""
-        <div class="station-card">
+        <div
+            class="station-card"
+            data-station-search="{html.escape(str(station_name)).lower()} {html.escape(str(location)).lower()} {html.escape(str(charger_type)).lower()}"
+            data-health-status="{health_class}"
+        >
 
             <div class="station-card-head">
 
@@ -2126,7 +3196,7 @@ def stations():
 
                 <div class="station-status">
                     <span></span>
-                    REGISTERED
+                    {health_status}
                 </div>
 
             </div>
@@ -2139,6 +3209,11 @@ def stations():
 
             <div class="station-card-location">
                 {location}
+            </div>
+
+            <div class="station-health-badge {health_class}">
+                <i></i>
+                {health_status}{f" · {health_value}%" if health_value is not None else ""}
             </div>
 
             <div class="station-card-divider"></div>
@@ -2695,6 +3770,50 @@ def stations():
         .stations-empty { color:#71877D; }
         .stations-empty h3 { color:#17352B; }
 
+        .station-filter-bar{
+            display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+            margin-bottom:16px;padding:12px;border-radius:13px;
+            background:linear-gradient(90deg,#F4FAF7,#FFF6FA,#FFF9EF);border:1px solid #E2ECE7;
+        }
+        .station-filter-wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:min(100%,520px);}
+        .station-filter-label{color:#789087;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap;}
+        .station-search,.station-filter{
+            appearance:none;-webkit-appearance:none;border:1px solid #CFE5D9;border-radius:10px;
+            background:#FFFFFF;color:#17352B;padding:9px 12px;font-family:inherit;font-size:11px;font-weight:800;outline:none;
+        }
+        .station-search{min-width:220px;flex:1 1 220px;}
+        .station-filter{min-width:155px;cursor:pointer;}
+        .station-search:focus,.station-filter:focus{border-color:#18B86A;box-shadow:0 0 0 3px rgba(24,184,106,.12);}
+        .station-filter-result{color:#6C8278;font-size:10px;font-weight:800;white-space:nowrap;}
+        .station-health-badge{
+            display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:5px 8px;border-radius:999px;
+            font-size:8px;font-weight:900;letter-spacing:.6px;
+        }
+        .station-health-badge i{width:6px;height:6px;border-radius:50%;display:block;}
+        .station-health-badge.healthy{color:#0C8F55;background:#E8F8F0;border:1px solid #C7E9D7;}
+        .station-health-badge.healthy i{background:#18B86A;}
+        .station-health-badge.moderate{color:#A96812;background:#FFF5E1;border:1px solid #F1D7A5;}
+        .station-health-badge.moderate i{background:#E79A22;}
+        .station-health-badge.critical{color:#C43B55;background:#FFF0F3;border:1px solid #F0C9D1;}
+        .station-health-badge.critical i{background:#E05267;}
+        .station-health-badge.no-data{color:#6C8278;background:#F2F6F4;border:1px solid #DCE8E2;}
+        .station-health-badge.no-data i{background:#91A49E;}
+        .station-card.is-hidden{display:none!important;}
+        .stations-no-results{
+            display:none;grid-column:1/-1;padding:42px 20px;text-align:center;border:1px dashed #CFE0D8;
+            border-radius:14px;background:#FBFDFC;color:#71877D;
+        }
+        .stations-no-results strong{display:block;color:#17352B;font-size:15px;margin-bottom:5px;}
+        body.night-mode .station-filter-bar{background:linear-gradient(90deg,#102D22,#17231F,#21171E)!important;border-color:#2B7454!important;}
+        body.night-mode .station-search,body.night-mode .station-filter{background:#0A2118!important;color:#F2FFF8!important;border-color:#317857!important;}
+        body.night-mode .station-filter-label,body.night-mode .station-filter-result{color:#A9CDBD!important;}
+        body.night-mode .stations-no-results{background:#0F2B21!important;border-color:#2B7454!important;color:#A7C4B7!important;}
+        body.night-mode .stations-no-results strong{color:#F4FFF9!important;}
+        body.night-mode .station-health-badge.healthy{color:#63F0AB!important;background:rgba(49,212,135,.14)!important;border-color:#2E8A61!important;}
+        body.night-mode .station-health-badge.moderate{color:#FFC55A!important;background:rgba(231,154,34,.14)!important;border-color:#805C27!important;}
+        body.night-mode .station-health-badge.critical{color:#FF91A2!important;background:rgba(224,82,103,.14)!important;border-color:#87414F!important;}
+        body.night-mode .station-health-badge.no-data{color:#A7C4B7!important;background:#173027!important;border-color:#36594A!important;}
+
     </style>
     """
 
@@ -2775,8 +3894,30 @@ def stations():
 
                     </div>
 
-                    <div class="stations-grid">
+                    <div class="station-filter-bar">
+                        <div class="station-filter-wrap">
+                            <span class="station-filter-label">Find Station</span>
+                            <input type="search" class="station-search" id="stationSearch"
+                                   placeholder="Search name, location or charger type" autocomplete="off">
+                            <select class="station-filter" id="stationHealthFilter">
+                                <option value="all">All Health Status</option>
+                                <option value="healthy">Healthy</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="critical">Critical</option>
+                                <option value="no-data">No Data</option>
+                            </select>
+                        </div>
+                        <div class="station-filter-result" id="stationFilterResult">
+                            {total_stations} stations shown
+                        </div>
+                    </div>
+
+                    <div class="stations-grid" id="stationsGrid">
                         {station_cards}
+                        <div class="stations-no-results" id="stationsNoResults">
+                            <strong>No matching stations</strong>
+                            Try changing the search text or health filter.
+                        </div>
                     </div>
 
                 </div>
@@ -2810,6 +3951,42 @@ def stations():
             </div>
 
         </div>
+
+        <script>
+        (function(){{
+            const searchInput = document.getElementById("stationSearch");
+            const healthFilter = document.getElementById("stationHealthFilter");
+            const result = document.getElementById("stationFilterResult");
+            const noResults = document.getElementById("stationsNoResults");
+            const cards = Array.from(document.querySelectorAll("#stationsGrid .station-card"));
+
+            function applyStationFilters(){{
+                const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+                const filter = healthFilter ? healthFilter.value : "all";
+                let visible = 0;
+
+                cards.forEach(function(card){{
+                    const searchable = (card.getAttribute("data-station-search") || "").toLowerCase();
+                    const health = card.getAttribute("data-health-status") || "no-data";
+                    const show = (!query || searchable.includes(query))
+                        && (filter === "all" || health === filter);
+                    card.classList.toggle("is-hidden", !show);
+                    if(show) visible += 1;
+                }});
+
+                if(result){{
+                    result.textContent = visible + (visible === 1 ? " station shown" : " stations shown");
+                }}
+                if(noResults){{
+                    noResults.style.display = visible === 0 ? "block" : "none";
+                }}
+            }}
+
+            if(searchInput) searchInput.addEventListener("input", applyStationFilters);
+            if(healthFilter) healthFilter.addEventListener("change", applyStationFilters);
+            applyStationFilters();
+        }})();
+        </script>
 
     </body>
 
@@ -4505,6 +5682,69 @@ def failure_history():
             }
         }
 
+
+
+        /* ===== FAILURE HISTORY: MATCH THE GREEN / PINK / ORANGE DASHBOARD ===== */
+        .failure-page-header h1{color:#17352B !important;font-weight:900 !important;}
+        .failure-page-header p{color:#6C8278 !important;}
+        .failure-eyebrow,.failure-panel-kicker{color:#D83F83 !important;}
+        .history-live{color:#B52F70 !important;background:#FFF0F7 !important;border-color:#F0C5D9 !important;}
+        .history-live-dot{background:#D83F83 !important;box-shadow:0 0 10px rgba(216,63,131,.45) !important;}
+
+        .failure-stats{gap:18px !important;}
+        .failure-stat{
+            background:#FFFFFF !important;
+            border:1px solid #DDEBE4 !important;
+            border-top:5px solid #19A968 !important;
+            border-radius:18px !important;
+            box-shadow:0 12px 28px rgba(23,53,43,.07) !important;
+        }
+        .failure-stat.total{border-top-color:#D83F83 !important;border-color:#F0D8E3 !important;}
+        .failure-stat.resolved{border-top-color:#19A968 !important;border-color:#D2EADF !important;}
+        .failure-stat.unresolved{border-top-color:#E49A18 !important;border-color:#F0DFC0 !important;}
+        .failure-stat-label{color:#71877D !important;}
+        .failure-stat-number{color:#17352B !important;}
+        .failure-stat.total .failure-stat-number{color:#C52F72 !important;}
+        .failure-stat.resolved .failure-stat-number{color:#168553 !important;}
+        .failure-stat.unresolved .failure-stat-number{color:#B8750B !important;}
+
+        .failure-panel{
+            background:#FFFFFF !important;
+            border:1px solid #DDEBE4 !important;
+            border-radius:20px !important;
+            box-shadow:0 14px 32px rgba(23,53,43,.07) !important;
+        }
+        .failure-panel-header h2{color:#17352B !important;}
+        .failure-count{color:#587067 !important;background:#F3F9F6 !important;border-color:#DCEAE3 !important;}
+
+        .failure-card{
+            background:#FFFFFF !important;
+            border:1px solid #DDEBE4 !important;
+            border-left:5px solid #19A968 !important;
+            border-radius:16px !important;
+            box-shadow:0 7px 20px rgba(23,53,43,.055) !important;
+        }
+        .failure-card:nth-child(3n){border-left-color:#D83F83 !important;}
+        .failure-card:nth-child(3n+2){border-left-color:#E49A18 !important;}
+        .failure-card:hover{transform:translateY(-2px) !important;border-color:#C8E4D6 !important;box-shadow:0 12px 25px rgba(23,53,43,.09) !important;}
+        .failure-type{color:#17352B !important;}
+        .failure-station{color:#71877D !important;}
+        .failure-description{color:#5E756B !important;}
+
+        .failure-icon.resolved{color:#168553 !important;background:#E8F8F0 !important;border-color:#BFE5D0 !important;}
+        .failure-icon.unresolved{color:#C43B55 !important;background:#FFF0F3 !important;border-color:#F0C5CE !important;}
+        .failure-status.resolved{color:#168553 !important;background:#E8F8F0 !important;border-color:#BFE5D0 !important;}
+        .failure-status.unresolved{color:#C43B55 !important;background:#FFF0F3 !important;border-color:#F0C5CE !important;}
+
+        .failure-detail{background:#F5FBF8 !important;border:1px solid #DFECE6 !important;border-radius:11px !important;}
+        .failure-detail:nth-child(2){background:#FFF5F9 !important;border-color:#F0D5E2 !important;}
+        .failure-detail:nth-child(3){background:#FFF9ED !important;border-color:#F0D9A7 !important;}
+        .failure-detail:nth-child(4){background:#F5FBF8 !important;border-color:#DFECE6 !important;}
+        .detail-label{color:#789087 !important;}
+        .detail-value{color:#355349 !important;}
+        .failure-empty{color:#71877D !important;}
+        .failure-empty h3{color:#17352B !important;}
+        .failure-empty-icon{color:#168553 !important;background:#E8F8F0 !important;border-color:#BFE5D0 !important;}
     </style>
     """
 
@@ -4759,30 +5999,13 @@ def analytics():
         )
         or '<tr><td colspan="5">No telemetry records available for this station.</td></tr>'
     )
-
-    def _chart_points(values, width=520, height=210):
-        vals = [float(v or 0) for v in values]
-        if not vals:
-            return ""
-        lo, hi = min(vals), max(vals)
-        span = (hi - lo) or 1
-        n = len(vals)
-        return " ".join(
-            f"{18+i*(width-36)/max(1,n-1):.1f},{(height-20)-((v-lo)/span)*(height-45):.1f}"
-            for i, v in enumerate(vals)
-        )
-
-    temp_points = _chart_points([r["temperature"] for r in reversed(telemetry[:12])])
-    power_points = _chart_points(
-        [r["power_consumption"] for r in reversed(telemetry[:12])]
-    )
     css = """
     <style>
     .analytics-heading{text-align:center;margin:4px 0 24px}.analytics-heading h1{margin:0;color:#17352B;font-size:38px;font-weight:900;letter-spacing:-1.2px}.analytics-heading p{margin:9px 0 0;color:#6C8278}.analytics-line{width:72px;height:4px;border-radius:99px;margin:12px auto 0;background:linear-gradient(90deg,#16A36A,#E49A18,#D83F83)}
     .analytics-selector{background:#FFF;border-radius:20px;padding:20px;box-shadow:0 10px 28px rgba(23,53,43,.08);display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:end;margin-bottom:20px}.analytics-selector label{display:block;color:#61786E;font-size:11px;font-weight:850;margin-bottom:7px}.analytics-selector select{width:100%;height:48px;border-radius:12px;padding:0 13px}.analytics-load{height:48px;border:0;border-radius:12px;background:linear-gradient(135deg,#16A36A,#31B77D);color:#FFF;font-weight:850;cursor:pointer}
     .analytics-metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px}.analytics-metric{background:#FFF;border-radius:17px;padding:18px;box-shadow:0 9px 25px rgba(23,53,43,.07);min-width:0}.analytics-metric:nth-child(3n+1){border-top:4px solid #16A36A}.analytics-metric:nth-child(3n+2){border-top:4px solid #D83F83}.analytics-metric:nth-child(3n){border-top:4px solid #E49A18}.analytics-metric span{display:block;color:#71877D;font-size:9px;font-weight:850;letter-spacing:.7px;text-transform:uppercase}.analytics-metric strong{display:block;margin-top:7px;color:#17352B;font-size:23px;font-weight:900}.analytics-metric:nth-child(2) strong{color:#D83F83}.analytics-metric:nth-child(3) strong{color:#C77B0B}.analytics-metric:nth-child(4) strong{color:#D83F83}.analytics-metric:nth-child(6) strong{color:#C77B0B}
     .analytics-two{display:grid;grid-template-columns:1fr 1fr;gap:20px}.analytics-panel{background:#FFF;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(23,53,43,.08)}.analytics-panel h2{margin:0;color:#17352B;font-size:20px}.analytics-panel-sub{margin:5px 0 15px;color:#71877D;font-size:12px}.analytics-row{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #E5EFEA;color:#61786E;font-size:13px}.analytics-row:last-child{border-bottom:0}.analytics-row strong{color:#355349}.health-visual{display:flex;align-items:center;justify-content:center;gap:25px;min-height:205px}.health-donut{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#16A36A 0 75%,#D83F83 75% 87%,#E49A18 87% 100%);position:relative}.health-donut:after{content:"";width:102px;height:102px;border-radius:50%;background:#FFF;position:absolute}.health-center{position:relative;z-index:1;text-align:center}.health-center strong{display:block;color:#17352B;font-size:28px}.health-center span{color:#71877D;font-size:9px;font-weight:850;letter-spacing:.8px}.health-legend div{display:flex;align-items:center;gap:9px;margin:12px 0;color:#587067;font-size:12px}.health-dot{width:9px;height:9px;border-radius:50%}.health-dot.g{background:#16A36A}.health-dot.p{background:#D83F83}.health-dot.o{background:#E49A18}.status-strip{margin-top:15px;border-radius:12px;padding:13px 15px;font-weight:800}.status-strip.healthy{background:#EAF8F1;color:#168553}.status-strip.warning{background:#FFF5E4;color:#A96812}.status-strip.critical{background:#FFF0F2;color:#C43B55}
-    .analytics-charts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.analytics-chart-panel{background:#FFF;border:1px solid #DFECE6;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(23,53,43,.07)}.analytics-chart-panel h2{margin:0;color:#17352B;font-size:20px}.analytics-chart-sub{margin:5px 0 14px;color:#71877D;font-size:12px}.analytics-chart-panel svg{width:100%;height:220px;display:block;background:#FAFDFC;border:1px solid #E7EFEA;border-radius:14px}.analytics-chart-panel svg line{stroke:#E1ECE7;stroke-width:1}.analytics-table{margin-top:20px;background:#FFF;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(23,53,43,.08);overflow:auto}.analytics-table table{width:100%;border-collapse:collapse}.analytics-table th{padding:12px;text-align:left;background:#F4F9F6;color:#61786E;font-size:10px;letter-spacing:.5px}.analytics-table td{padding:12px;border-bottom:1px solid #E5EFEA;color:#355349;font-size:12px}.health-pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#EAF8F1;color:#168553;font-weight:800;font-size:10px}
+    .analytics-table{margin-top:20px;background:#FFF;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(23,53,43,.08);overflow:auto}.analytics-table table{width:100%;border-collapse:collapse}.analytics-table th{padding:12px;text-align:left;background:#F4F9F6;color:#61786E;font-size:10px;letter-spacing:.5px}.analytics-table td{padding:12px;border-bottom:1px solid #E5EFEA;color:#355349;font-size:12px}.health-pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#EAF8F1;color:#168553;font-weight:800;font-size:10px}
     @media(max-width:1100px){.analytics-metrics{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.analytics-selector,.analytics-two{grid-template-columns:1fr}.analytics-metrics{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.analytics-metrics{grid-template-columns:1fr}.health-visual{flex-direction:column}}
     </style>"""
     return f"""
@@ -4796,7 +6019,6 @@ def analytics():
             <article class="analytics-panel"><div class="section-kicker">HEALTH &amp; MAINTENANCE</div><h2>Operational Summary</h2><div class="analytics-panel-sub">Latest readings and service activity.</div><div class="analytics-row"><span>Maintenance Records</span><strong>{maintenance}</strong></div><div class="analytics-row"><span>Latest Temperature</span><strong>{latest_temp:.2f} °C</strong></div><div class="analytics-row"><span>Latest Humidity</span><strong>{latest_humidity:.2f} %</strong></div><div class="analytics-row"><span>Latest Power</span><strong>{latest_power:.2f} kW</strong></div></article>
             <article class="analytics-panel"><div class="section-kicker">CURRENT HEALTH</div><h2>Station Health Status</h2><div class="analytics-panel-sub">Calculated from the latest telemetry readings.</div><div class="health-visual"><div class="health-donut"><div class="health-center"><strong>{health}%</strong><span>HEALTH STATUS</span></div></div><div class="health-legend"><div><i class="health-dot g"></i>Healthy <strong>{healthy_count}</strong></div><div><i class="health-dot p"></i>Warning <strong>{warning_count}</strong></div><div><i class="health-dot o"></i>Critical <strong>{critical_count}</strong></div></div></div><div class="status-strip {status_cls}">Station status: {status}</div></article>
         </section>
-        <section class="analytics-charts"><article class="analytics-chart-panel"><div class="section-kicker">TEMPERATURE</div><h2>Temperature Trend</h2><div class="analytics-chart-sub">Recent thermal readings from this station.</div><svg viewBox="0 0 520 210" preserveAspectRatio="none"><line x1="18" y1="190" x2="502" y2="190"/><line x1="18" y1="120" x2="502" y2="120"/><line x1="18" y1="50" x2="502" y2="50"/><polyline points="{temp_points}" fill="none" stroke="#16A36A" stroke-width="4" stroke-linecap="round"/></svg></article><article class="analytics-chart-panel"><div class="section-kicker" style="color:#D83F83!important">POWER CONSUMPTION</div><h2>Power Trend</h2><div class="analytics-chart-sub">Recent load readings from this station.</div><svg viewBox="0 0 520 210" preserveAspectRatio="none"><line x1="18" y1="190" x2="502" y2="190"/><line x1="18" y1="120" x2="502" y2="120"/><line x1="18" y1="50" x2="502" y2="50"/><polyline points="{power_points}" fill="none" stroke="#D83F83" stroke-width="4" stroke-linecap="round"/></svg></article></section>
         <section class="analytics-table"><div class="section-kicker">RECENT ACTIVITY</div><h2 style="margin:0;color:#17352B">Latest Telemetry</h2><div class="analytics-panel-sub">Recent sensor readings from this station.</div><table><thead><tr><th>ID</th><th>Temperature</th><th>Humidity</th><th>Power</th><th>Health</th></tr></thead><tbody>{rows_html}</tbody></table></section>
     </main></body></html>"""
 
@@ -4966,6 +6188,97 @@ def battery_health():
                 </div>
             </div>
         </div>
+
+        <script>
+        (function(){{
+            const selector = document.getElementById("batteryTrendSelector");
+            const line = document.getElementById("batteryTrendLine");
+            const highLabel = document.getElementById("trendLabelHigh");
+            const midLabel = document.getElementById("trendLabelMid");
+            const lowLabel = document.getElementById("trendLabelLow");
+            const legend = document.getElementById("trendLegendText");
+
+            const healthData = {health_values};
+            const temperatureData = {temperatures};
+            const powerData = {powers};
+
+            const configs = {{
+                health: {{
+                    label: "Health Score",
+                    unit: "%",
+                    values: healthData,
+                    stroke: "#18B86A",
+                    fixedMin: 0,
+                    fixedMax: 100
+                }},
+                temperature: {{
+                    label: "Temperature",
+                    unit: "°C",
+                    values: temperatureData,
+                    stroke: "#E79A22"
+                }},
+                power: {{
+                    label: "Power Consumption",
+                    unit: " kW",
+                    values: powerData,
+                    stroke: "#D83F83"
+                }}
+            }};
+
+            function formatValue(value){{
+                const rounded = Math.round(value * 10) / 10;
+                return String(rounded).replace(".0", "");
+            }}
+
+            function drawTrend(type){{
+                const config = configs[type] || configs.health;
+                const values = config.values || [];
+
+                if(!values.length){{
+                    line.setAttribute("points", "");
+                    highLabel.textContent = "—";
+                    midLabel.textContent = "—";
+                    lowLabel.textContent = "—";
+                    legend.textContent = config.label;
+                    return;
+                }}
+
+                let min = config.fixedMin;
+                let max = config.fixedMax;
+
+                if(min === undefined || max === undefined){{
+                    const rawMin = Math.min.apply(null, values);
+                    const rawMax = Math.max.apply(null, values);
+                    const spread = Math.max(rawMax - rawMin, 1);
+                    const padding = spread * 0.15;
+                    min = Math.max(0, rawMin - padding);
+                    max = rawMax + padding;
+                    if(max === min) max = min + 1;
+                }}
+
+                const points = values.map(function(value, index){{
+                    const x = 25 + (index * 390 / Math.max(1, values.length - 1));
+                    const ratio = (value - min) / Math.max(0.0001, max - min);
+                    const y = 220 - (Math.max(0, Math.min(1, ratio)) * 175);
+                    return x.toFixed(1) + "," + y.toFixed(1);
+                }}).join(" ");
+
+                line.setAttribute("points", points);
+                line.setAttribute("stroke", config.stroke);
+                highLabel.textContent = formatValue(max) + config.unit;
+                midLabel.textContent = formatValue((max + min) / 2) + config.unit;
+                lowLabel.textContent = formatValue(min) + config.unit;
+                legend.textContent = config.label;
+            }}
+
+            if(selector){{
+                selector.addEventListener("change", function(){{
+                    drawTrend(selector.value);
+                }});
+                drawTrend(selector.value);
+            }}
+        }})();
+        </script>
     </body>
     </html>
     """
