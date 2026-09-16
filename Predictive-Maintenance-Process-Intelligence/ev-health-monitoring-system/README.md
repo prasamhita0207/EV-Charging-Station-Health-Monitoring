@@ -147,6 +147,8 @@ Cloud deployment
 Advanced predictive maintenance models
 Historical performance visualization
 Real-time charging station monitoring
-#Author
 
-#K.PRASAMHITA
+
+AUTHOR :
+K.PRASAMHITA
+
